@@ -317,17 +317,6 @@ fn main() {
         Obstacle::new_point(WIDTH as isize / 4, HEIGHT as isize / 4 * 3),
         Obstacle::new_point(WIDTH as isize / 4 * 3, HEIGHT as isize / 4 * 3),
         Obstacle::new_rect(0, 0, HEIGHT as isize - 1, WIDTH as isize - 1, false),
-        /*
-        Obstacle::new_line(2, HEIGHT as isize / 2, WIDTH as isize - 3, HEIGHT as isize / 2),
-        Obstacle::new_line(WIDTH as isize / 2, 2, WIDTH as isize / 2, HEIGHT as isize - 3),
-
-        Obstacle::new_line(WIDTH as isize / 2, 2, WIDTH as isize - 3, 2),
-        Obstacle::new_line(2, HEIGHT as isize - 3, WIDTH as isize / 2, HEIGHT as isize - 3),
-
-        Obstacle::new_line(2, 2, 2, HEIGHT as isize / 2),
-        Obstacle::new_line(WIDTH as isize - 3, HEIGHT as isize / 2, WIDTH as isize - 3, HEIGHT as isize - 3),
-        */
-
     ];
     let mut snake: Snake = Snake::new(
         10,
