@@ -45,7 +45,7 @@ impl Snake {
         maxx: isize, maxy: isize, 
         dir: geo::Direction, 
         comp: bool, 
-        obs: &Vec<geo::Obstacle>
+        obs: &Vec<geo::Shape>
         ) -> Snake {
         let mut res = Snake { 
             scales: VecDeque::new(), 
@@ -135,11 +135,11 @@ impl Snake {
 
 pub fn game_loop(pth: &std::path::PathBuf) {
     let obs = vec![
-        geo::Obstacle::new_point(WIDTH as isize / 4, HEIGHT as isize / 4),
-        geo::Obstacle::new_point(WIDTH as isize / 4 * 3, HEIGHT as isize / 4),
-        geo::Obstacle::new_point(WIDTH as isize / 4, HEIGHT as isize / 4 * 3),
-        geo::Obstacle::new_point(WIDTH as isize / 4 * 3, HEIGHT as isize / 4 * 3),
-        geo::Obstacle::new_rect(0, 0, HEIGHT as isize - 1, WIDTH as isize - 1, false),
+        geo::Shape::new_point(WIDTH as isize / 4, HEIGHT as isize / 4),
+        geo::Shape::new_point(WIDTH as isize / 4 * 3, HEIGHT as isize / 4),
+        geo::Shape::new_point(WIDTH as isize / 4, HEIGHT as isize / 4 * 3),
+        geo::Shape::new_point(WIDTH as isize / 4 * 3, HEIGHT as isize / 4 * 3),
+        geo::Shape::new_rect(0, 0, HEIGHT as isize - 1, WIDTH as isize - 1, false),
     ];
     let mut snake = Snake::new(
         10,
