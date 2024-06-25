@@ -96,8 +96,8 @@ impl Snake {
             self.score += 1;
             self.gen_pickups();
         } else if nxt_tile == BODY_COL || nxt_tile == WALL_COL {
-            self.alive = false;
-            return;
+            //self.alive = false;
+            //return;
         } else {
             let cur_back = self.scales.back().unwrap();
             self.buf.set(cur_back.x, cur_back.y, BACK_COL);
@@ -106,6 +106,10 @@ impl Snake {
         if !self.scales.is_empty() {
             self.buf.set(last_head.x, last_head.y, BODY_COL);
         }
+        let s = ron::to_string(&new_head).unwrap();
+        let d = ron::to_string(&self.dir).unwrap();
+        println!("head: {}, dir: {}", s, d);
+
         self.buf.set(new_head.x, new_head.y, self.head_color());
         self.scales.push_front(new_head);
     }
@@ -134,13 +138,7 @@ impl Snake {
 }
 
 pub fn game_loop(pth: &std::path::PathBuf) {
-    let obs = vec![
-        geo::Shape::new_point(WIDTH as isize / 4, HEIGHT as isize / 4),
-        geo::Shape::new_point(WIDTH as isize / 4 * 3, HEIGHT as isize / 4),
-        geo::Shape::new_point(WIDTH as isize / 4, HEIGHT as isize / 4 * 3),
-        geo::Shape::new_point(WIDTH as isize / 4 * 3, HEIGHT as isize / 4 * 3),
-        geo::Shape::new_rect(0, 0, HEIGHT as isize - 1, WIDTH as isize - 1, false),
-    ];
+    let (_, obs) = crate::alpha_print::convert(0, 0, 1, "ABO");
     let mut snake = Snake::new(
         10,
         3,

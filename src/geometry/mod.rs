@@ -1,4 +1,5 @@
 use std::ops::{Add, Sub};
+use serde::{Serialize, Deserialize};
 
 mod math;
 use math::n_mod_m;
@@ -6,7 +7,7 @@ use math::n_mod_m;
 pub mod color;
 
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Point {
     pub x: isize,
     pub y: isize,
@@ -155,7 +156,7 @@ impl DrawBuffer {
 
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Direction {
     Left,
     Right,
@@ -174,10 +175,13 @@ impl Direction {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Shape {
+    #[serde(rename = "p")]
     Point(Point),
+    #[serde(rename = "l")]
     Line(Point, Point),
+    #[serde(rename = "r")]
     Rectangle(Point, Point, bool),
 }
 
