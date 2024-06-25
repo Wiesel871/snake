@@ -1,4 +1,4 @@
-use crate::geometry as geo;
+use crate::{alpha_print, geometry as geo};
 
 use std::collections::VecDeque;
 
@@ -6,8 +6,8 @@ use rand::{Rng, SeedableRng};
 
 use minifb::{Key, Window, WindowOptions, Menu, MenuItem};
 
-const WIDTH: usize = 24;
-const HEIGHT: usize = 24;
+const WIDTH: usize = 160;
+const HEIGHT: usize = 20;
 const FPS: usize = 165;
 const SPEED: usize = 2;
 
@@ -138,11 +138,14 @@ impl Snake {
 }
 
 pub fn game_loop(pth: &std::path::PathBuf) {
-    let (_, obs) = crate::alpha_print::convert(0, 0, 1, "ABO");
+    let font = alpha_print::font::Font::load("pixel.font");
+    let (_, mut obs) = alpha_print::convert(&font, 0, 0, 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    let (_, mut obs2) = alpha_print::convert(&font, 0, 8, 1, "abcdefghi");
+    obs.append(&mut obs2);
     let mut snake = Snake::new(
-        10,
+        159,
         3,
-        5, 
+        1, 
         WIDTH as isize, 
         HEIGHT as isize, 
         geo::Direction::Right,
@@ -186,7 +189,7 @@ pub fn game_loop(pth: &std::path::PathBuf) {
     while snake.alive && window.is_open() && !window.is_key_down(Key::Escape) {
         if cur_frame == FPS / SPEED {
             cur_frame = 0;
-            snake.shift_draw();
+            //snake.shift_draw();
         } else {
             cur_frame += 1;
         }

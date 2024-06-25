@@ -110,24 +110,64 @@ impl DrawBuffer {
         self.set_with_sc(st.x, st.y, sc, col);
     }
 
-    pub fn draw_line(&mut self, st: Point, ls: Point, sc: isize, col: u32) {
-        if st.x != ls.x && st.y != ls.y {
-            todo!();
+    fn pos_slope(&mut self, st: Point, ls: Point, sc: isize, col: u32) {
+        let dx = ls.x - st.x;
+        let mut dy = ls.y - st.y;
+        let mut y = st.y;
+        let mut yi = 1;
+        if dy < 0 {
+            dy = -dy;
+            yi = -1;
         }
-        if st.x != ls.x {
-            let mut x = st.x;
-            while x != ls.x {
-                self.set_with_sc(x, st.y, sc, col);
-                x = self.normalized_x(x + 1);
+        let mut slope = 2 * dy - dx;
+        let mut x = st.x;
+        while x <= ls.x {
+            self.set_with_sc(x, y, sc, col);
+            if slope > 0 {
+                y += yi;
+                slope -= 2 * dx;
             }
-            self.set_with_sc(x, st.y, sc, col);
+            slope += 2 * dy;
+            x += 1;
+        }
+    }
+
+    fn neg_slope(&mut self, st: Point, ls: Point, sc: isize, col: u32) {
+        let mut dx = ls.x - st.x;
+        let dy = ls.y - st.y;
+        let mut x = st.x;
+        let mut xi = 1;
+        if dx < 0 {
+            dx = -dx;
+            xi = -1;
+        }
+        let mut slope = 2 * dx - dy;
+        let mut y = st.y;
+        while y <= ls.y {
+            self.set_with_sc(x, y, sc, col);
+            if slope > 0 {
+                x += xi;
+                slope -= 2 * dy;
+            }
+            slope += 2 * dx;
+            y += 1;
+        }
+    }
+
+
+    pub fn draw_line(&mut self, st: Point, ls: Point, sc: isize, col: u32) {
+        if (ls.y - st.y).abs() < (ls.x - st.x) {
+            if st.x > ls.x {
+                self.pos_slope(ls, st, sc, col);
+            } else {
+                self.pos_slope(st, ls, sc, col);
+            }
         } else {
-            let mut y = st.y;
-            while y != ls.y {
-                self.set_with_sc(st.x, y, sc, col);
-                y = self.normalized_y(y + 1);
+            if st.y > ls.y {
+                self.neg_slope(ls, st, sc, col);
+            } else {
+                self.neg_slope(st, ls, sc, col);
             }
-            self.set_with_sc(st.x, y, sc, col);
         }
     }
 
