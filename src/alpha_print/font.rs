@@ -40,9 +40,9 @@ impl Font {
                     maxx = max(maxx, mx.x); 
                     Sh::new_line(x + mn.x * sc, y + mn.y * sc, x + mx.x * sc, y + mx.y * sc)
                 },
-                Sh::Rectangle(min, mx, fil) => {
+                Sh::Rectangle(mn, mx, fil) => {
                     maxx = max(maxx, mx.x); 
-                    Sh::new_rect(x + min.x * sc, y + min.y * sc, x + mx.x * sc, y + mx.y * sc, *fil)
+                    Sh::new_rect(x + mn.x * sc, y + mn.y * sc, x + mx.x * sc, y + mx.y * sc, *fil)
                 },
             });
         }

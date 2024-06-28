@@ -7,7 +7,7 @@ use rand::{Rng, SeedableRng};
 use minifb::{Key, Window, WindowOptions, Menu, MenuItem};
 
 const WIDTH: usize = 160;
-const HEIGHT: usize = 20;
+const HEIGHT: usize = 30;
 const FPS: usize = 165;
 const SPEED: usize = 2;
 
@@ -140,8 +140,10 @@ impl Snake {
 pub fn game_loop(pth: &std::path::PathBuf) {
     let font = alpha_print::font::Font::load("pixel.font");
     let (_, mut obs) = alpha_print::convert(&font, 0, 0, 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    let (_, mut obs2) = alpha_print::convert(&font, 0, 8, 1, "abcdefghi");
+    let (_, mut obs2) = alpha_print::convert(&font, 0, 8, 1, "abcdefghijklmnopqrstuvwx yz,.");
+    let (_, mut obs3) = alpha_print::convert(&font, 0, 18, 1, "0123456789");
     obs.append(&mut obs2);
+    obs.append(&mut obs3);
     let mut snake = Snake::new(
         159,
         3,
