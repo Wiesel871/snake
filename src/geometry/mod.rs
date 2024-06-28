@@ -175,25 +175,11 @@ impl DrawBuffer {
         if fil {
             todo!();
         }
-        let mut x = min.y;
-        while x != max.x {
-            self.set_with_sc(x, min.y, sc, col);
-            self.set_with_sc(x, max.y, sc, col);
-            x = self.normalized_x(x + 1);
-        }
-        self.set_with_sc(x, min.y, sc, col);
-        self.set_with_sc(x, max.y, sc, col);
-
-        let mut y = min.y;
-        while y != max.y {
-            self.set_with_sc(min.x, y, sc, col);
-            self.set_with_sc(max.x, y, sc, col);
-            y = self.normalized_y(y + 1);
-        }
-        self.set_with_sc(min.x, y, sc, col);
-        self.set_with_sc(max.x, y, sc, col);
+        self.draw_line(min, Point { x: min.x, y: max.y }, sc, col);
+        self.draw_line(min, Point { x: max.x, y: min.y }, sc, col);
+        self.draw_line(Point { x: min.x, y: max.y }, max, sc, col);
+        self.draw_line(Point { x: max.x, y: min.y }, max, sc, col);
     }
-
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
