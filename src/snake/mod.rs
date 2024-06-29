@@ -4,12 +4,12 @@ use std::collections::VecDeque;
 
 use rand::{Rng, SeedableRng};
 
+mod level;
+
 use minifb::{Key, Window, WindowOptions, Menu, MenuItem};
 
-const WIDTH: usize = 160;
-const HEIGHT: usize = 30;
 const FPS: usize = 165;
-const SPEED: usize = 2;
+const SPEED: usize = 16;
 
 
 const BACK_COL: u32 = geo::color::WHITE;
@@ -40,17 +40,13 @@ impl Snake {
     }
 
     pub fn new(
-        x: isize, y: isize, 
-        st_len: usize, 
-        maxx: isize, maxy: isize, 
-        dir: geo::Direction, 
+        lvl: &mut level::Level,
         comp: bool, 
-        obs: &Vec<geo::Shape>
         ) -> Snake {
         let mut res = Snake { 
             scales: VecDeque::new(), 
-            buf: geo::DrawBuffer::new(maxx, maxy, BACK_COL), 
-            dir, 
+            buf: geo::DrawBuffer::new(lvl.width, lvl.height, BACK_COL), 
+            dir: lvl.start_dir, 
             score: 0,
             rng: if comp {
                 rand::prelude::StdRng::seed_from_u64(0)
@@ -59,20 +55,19 @@ impl Snake {
             },
             alive: true,
         };
-        let mut aux = geo::Point::new(x, y);
-        res.buf.set(aux.x, aux.y, res.head_color());
-        res.scales.push_back(aux.clone());
-        let op = dir.oposite();
-        for _ in 1..st_len {
-            aux.shift(op);
-            res.buf.normalize(&mut aux);
-            res.buf.set(aux.x, aux.y, BODY_COL);
-            res.scales.push_back(aux.clone());
+        res.buf.set(lvl.snake_start.x, lvl.snake_start.y, res.head_color());
+        res.scales.push_back(lvl.snake_start.clone());
+        let op = lvl.start_dir.oposite();
+        for _ in 1..lvl.snake_len {
+            lvl.snake_start.shift(op);
+            res.buf.normalize(&mut lvl.snake_start);
+            res.buf.set(lvl.snake_start.x, lvl.snake_start.y, BODY_COL);
+            res.scales.push_back(lvl.snake_start.clone());
         }
-        for ob in obs.iter() {
-            ob.draw(&mut res.buf, WALL_COL);
+        for wall in lvl.walls.iter() {
+            wall.draw(&mut res.buf, WALL_COL);
         }
-        assert!(res.scales.len() == st_len);
+        assert!(res.scales.len() == lvl.snake_len);
         res.gen_pickups();
         return res;
     }
@@ -96,8 +91,8 @@ impl Snake {
             self.score += 1;
             self.gen_pickups();
         } else if nxt_tile == BODY_COL || nxt_tile == WALL_COL {
-            //self.alive = false;
-            //return;
+            self.alive = false;
+            return;
         } else {
             let cur_back = self.scales.back().unwrap();
             self.buf.set(cur_back.x, cur_back.y, BACK_COL);
@@ -137,22 +132,13 @@ impl Snake {
 
 }
 
-pub fn game_loop(pth: &std::path::PathBuf) {
+pub fn game_loop(pth: &str) {
     let font = alpha_print::font::Font::load("pixel.font");
-    let (_, mut obs) = alpha_print::convert(&font, 0, 0, 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    let (_, mut obs2) = alpha_print::convert(&font, 0, 8, 1, "abcdefghijklmnopqrstuvwx yz,.");
-    let (_, mut obs3) = alpha_print::convert(&font, 0, 18, 1, "0123456789");
-    obs.append(&mut obs2);
-    obs.append(&mut obs3);
+    let mut lvl = level::Level::load(pth);
+    println!("lvl: {}", ron::to_string(&lvl).unwrap());
     let mut snake = Snake::new(
-        159,
-        3,
-        1, 
-        WIDTH as isize, 
-        HEIGHT as isize, 
-        geo::Direction::Right,
-        true,
-        &obs
+        &mut lvl,
+        true
     );
 
     let mut opts = WindowOptions::default();
@@ -163,8 +149,8 @@ pub fn game_loop(pth: &std::path::PathBuf) {
 
     let mut window = Window::new(
         "Test - ESC to exit",
-        WIDTH,
-        HEIGHT,
+        1920,
+        1080,
         opts,
     )
     .unwrap_or_else(|e| {
@@ -172,6 +158,7 @@ pub fn game_loop(pth: &std::path::PathBuf) {
     });
     window.set_background_color(0xff, 0xff, 0xff);
 
+    /*
     let mut help = Menu::new("help").unwrap();
     let wall = MenuItem::new("black - wall", 0);
     help.add_menu_item(&wall);
@@ -182,22 +169,23 @@ pub fn game_loop(pth: &std::path::PathBuf) {
     let apll = MenuItem::new("red - apple", 3);
     help.add_menu_item(&apll);
     window.add_menu(&help);
+    */
 
     window.set_target_fps(FPS);
     window
-        .update_with_buffer(snake.buf_as_vec_u32(), WIDTH, HEIGHT)
+        .update_with_buffer(snake.buf_as_vec_u32(), lvl.width as usize, lvl.height as usize)
         .unwrap();
     let mut cur_frame: usize = 0;
     while snake.alive && window.is_open() && !window.is_key_down(Key::Escape) {
         if cur_frame == FPS / SPEED {
             cur_frame = 0;
-            //snake.shift_draw();
+            snake.shift_draw();
         } else {
             cur_frame += 1;
         }
         snake.parse_keys(window.get_keys_pressed(minifb::KeyRepeat::Yes));
         window
-            .update_with_buffer(snake.buf_as_vec_u32(), WIDTH, HEIGHT)
+            .update_with_buffer(snake.buf_as_vec_u32(), lvl.width as usize, lvl.height as usize)
             .unwrap();
 
     }

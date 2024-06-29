@@ -1,0 +1,8 @@
+(
+    height:16,
+    width:16,
+    snake_len:3,
+    snake_start:(x:4,y:4),
+    start_dir:Right,
+    walls:[]
+)
