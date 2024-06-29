@@ -2,7 +2,9 @@
     height:16,
     width:16,
     snake_len:3,
-    snake_start:(x:4,y:4),
+    snake_start:(x:7,y:2),
     start_dir:Right,
-    walls:[]
+    walls:[
+	r((x:0, y:0), (x:15,y:15), false)
+    ]
 )

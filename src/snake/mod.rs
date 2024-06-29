@@ -9,7 +9,7 @@ mod level;
 use minifb::{Key, Window, WindowOptions, Menu, MenuItem};
 
 const FPS: usize = 165;
-const SPEED: usize = 16;
+const SPEED: usize = 2;
 
 
 const BACK_COL: u32 = geo::color::WHITE;
@@ -22,6 +22,7 @@ const WALL_COL: u32 = geo::color::BLACK;
 struct Snake {
     scales: std::collections::VecDeque<geo::Point>,
     dir: geo::Direction,
+    last_dir: geo::Direction,
     buf: geo::DrawBuffer,
     score: u32,
     rng: rand::prelude::StdRng,
@@ -47,6 +48,7 @@ impl Snake {
             scales: VecDeque::new(), 
             buf: geo::DrawBuffer::new(lvl.width, lvl.height, BACK_COL), 
             dir: lvl.start_dir, 
+            last_dir: lvl.start_dir,
             score: 0,
             rng: if comp {
                 rand::prelude::StdRng::seed_from_u64(0)
@@ -84,6 +86,7 @@ impl Snake {
     pub fn shift_draw(self: &mut Self) {
         let last_head = self.scales.front().unwrap().clone();
         let mut new_head = last_head.shifted(self.dir);
+        self.last_dir = self.dir;
         self.buf.normalize(&mut new_head);
         let nxt_tile = self.buf.get(new_head.x, new_head.y);
 
@@ -122,7 +125,7 @@ impl Snake {
                 minifb::Key::Down   | minifb::Key::S => geo::Direction::Down,
                 _ => self.dir,
             };
-            if new_dir != self.dir.oposite() {
+            if new_dir != self.last_dir.oposite() {
                 self.dir = new_dir;
             }
         }
@@ -143,6 +146,7 @@ pub fn game_loop(pth: &str) {
 
     let mut opts = WindowOptions::default();
     opts.scale = minifb::Scale::FitScreen;
+    opts.borderless = true;
     opts.scale_mode = minifb::ScaleMode::AspectRatioStretch;
     opts.resize = true;
     opts.topmost = true;
